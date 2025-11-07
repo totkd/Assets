@@ -43,45 +43,33 @@ def make_gallery_md(images, limit=None):
     lines = []
     lines.append("### Latest Images\n")
 
-    # 3つずつテーブル行を作る
     for group in chunk3(images):
         # 画像行
-        row_imgs = ["|"]  # 先頭の |
+        row_imgs = []
         for p in group:
             rel = p.relative_to(ROOT).as_posix()
             url = f"https://raw.githubusercontent.com/{REPO}/main/{rel}"
-            cell = (
-                f'<a href="{url}">'
-                f'<img src="{url}" width="220" />'
-                f"</a>"
-            )
-            row_imgs.append(f" {cell} |")
-        # 足りないセル(画像数が3で割り切れないとき)を埋める
-        while len(row_imgs) < 4:  # 先頭の"|"込みで4 = 3セル
-            row_imgs.append("  |")
-        lines.append("".join(row_imgs))
-
-        # 区切り行（最初のグループの時だけでもいいけど、見やすさ優先で毎回入れてもOK）
-        # ここでは最初の1回だけ入れる
-        if group is images[: len(group)]:
-            lines.append("|---|---|---|")
+            cell = f'<a href="{url}"><img src="{url}" width="220" /></a>'
+            row_imgs.append(cell)
+        while len(row_imgs) < 3:
+            row_imgs.append(" ")  # 空白セルで埋める
+        lines.append("| " + " | ".join(row_imgs) + " |")
+        lines.append("|---|---|---|")
 
         # URL/パス行
-        row_meta = ["|"]
+        row_meta = []
         for p in group:
             rel = p.relative_to(ROOT).as_posix()
             url = f"https://raw.githubusercontent.com/{REPO}/main/{rel}"
-            cell = (
-                f"`{url}`<br>"
-                f"`{rel}`"
-            )
-            row_meta.append(f" {cell} |")
-        while len(row_meta) < 4:
-            row_meta.append("  |")
-        lines.append("".join(row_meta))
+            cell = f"`{url}`<br>`{rel}`"
+            row_meta.append(cell)
+        while len(row_meta) < 3:
+            row_meta.append(" ")
+        lines.append("| " + " | ".join(row_meta) + " |")
+
+        lines.append("")  # グループごとに空行で区切り
 
     return "\n".join(lines).strip() + "\n"
-
 
 def main():
     images = list_images()
